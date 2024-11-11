@@ -1,35 +1,45 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { useState } from 'react';
+import MainLayout from './components/Layout/MainLayout';
+import DiagramCanvas from './components/Canvas/DiagramCanvas';
+import Toolbar from './components/Toolbar/Toolbar';
+import PropertyPanel from './components/PropertyPanel/PropertyPanel';
 
-function App() {
-  const [count, setCount] = useState(0)
-
-  return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+interface DiagramElement {
+  id: string;
+  type: 'task' | 'event' | 'gateway';
+  position: { x: number; y: number };
+  size: { width: number; height: number };
+  text: string;
 }
 
-export default App
+function App() {
+  const [elements, setElements] = useState<DiagramElement[]>([]);
+
+  const handleAddElement = (type: 'task' | 'event' | 'gateway') => {
+    const newElement: DiagramElement = {
+      id: `element-${Date.now()}`,
+      type,
+      position: { x: 100, y: 100 },
+      size: { width: 100, height: 100 },
+      text: type.charAt(0).toUpperCase() + type.slice(1)
+    };
+    setElements([...elements, newElement]);
+  };
+
+  return (
+    <MainLayout>
+      <div className="flex flex-col h-full">
+        <Toolbar onAddElement={handleAddElement} />
+        <div className="flex flex-1 gap-4">
+          <DiagramCanvas 
+            elements={elements}
+            onElementsChange={setElements}
+          />
+          <PropertyPanel />
+        </div>
+      </div>
+    </MainLayout>
+  );
+}
+
+export default App;
